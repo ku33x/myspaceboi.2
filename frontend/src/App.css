@@ -1,0 +1,117 @@
+.App {
+    min-height: 100vh;
+    background-color: #050505;
+}
+
+/* Halftone / scanline overlay for vintage CRT feel */
+.halftone-overlay {
+    background-image:
+        radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+}
+
+.scanlines-overlay {
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.12) 0px,
+        rgba(0, 0, 0, 0.12) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+}
+
+.vignette-overlay {
+    background: radial-gradient(
+        ellipse at center,
+        transparent 30%,
+        rgba(0, 0, 0, 0.55) 85%,
+        rgba(0, 0, 0, 0.85) 100%
+    );
+}
+
+@keyframes pulse-dot {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.55;
+        transform: scale(0.85);
+    }
+}
+
+.status-dot {
+    animation: pulse-dot 2.2s ease-in-out infinite;
+}
+
+@keyframes float-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.float-in {
+    animation: float-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.delay-1 {
+    animation-delay: 0.1s;
+}
+.delay-2 {
+    animation-delay: 0.25s;
+}
+.delay-3 {
+    animation-delay: 0.4s;
+}
+.delay-4 {
+    animation-delay: 0.55s;
+}
+.delay-5 {
+    animation-delay: 0.7s;
+}
+
+.glass-card {
+    background: rgba(18, 18, 20, 0.55);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.social-icon-btn {
+    transition:
+        transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+        filter 0.25s ease,
+        opacity 0.25s ease;
+    opacity: 0.92;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+}
+
+.social-icon-btn:hover {
+    transform: translateY(-4px) scale(1.08);
+    opacity: 1;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.8));
+}
+
+.avatar-ring {
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.08),
+        0 12px 40px rgba(0, 0, 0, 0.65);
+}
+
+.unmute-btn {
+    transition: all 0.25s ease;
+}
+.unmute-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.05);
+}
