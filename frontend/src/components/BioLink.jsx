@@ -4,12 +4,12 @@ import { Eye, Volume2, VolumeX, Play } from "lucide-react";
 const DISCORD_USER_ID = "651336986019495937";
 const VIDEO_URL =
   "https://customer-assets.emergentagent.com/job_bio-page-5/artifacts/xckchlkl_videoplayback.mp4";
+const API_BASE = process.env.REACT_APP_BACKEND_URL || "";
 
 const SOCIALS = [
   {
     name: "Discord",
     href: "https://discordapp.com/users/651336986019495937",
-    color: "#5865F2",
     svg: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
         <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3a14.55 14.55 0 0 0-.658 1.342 18.27 18.27 0 0 0-5.487 0A14.16 14.16 0 0 0 9.748 3 19.74 19.74 0 0 0 5.99 4.37C2.61 9.36 1.696 14.22 2.153 19.01a19.9 19.9 0 0 0 5.997 3.03 14.65 14.65 0 0 0 1.276-2.075 12.86 12.86 0 0 1-2.012-.96c.169-.124.334-.253.493-.385a14.13 14.13 0 0 0 12.186 0c.16.132.325.261.494.385a12.9 12.9 0 0 1-2.014.96 14.7 14.7 0 0 0 1.276 2.075 19.86 19.86 0 0 0 5.998-3.03c.5-5.18-.85-9.99-3.53-14.64ZM9.546 16.044c-1.182 0-2.156-1.075-2.156-2.394 0-1.318.953-2.394 2.156-2.394 1.21 0 2.176 1.083 2.156 2.394 0 1.319-.953 2.394-2.156 2.394Zm4.907 0c-1.181 0-2.156-1.075-2.156-2.394 0-1.318.953-2.394 2.156-2.394 1.211 0 2.177 1.083 2.156 2.394 0 1.319-.945 2.394-2.156 2.394Z" />
@@ -19,7 +19,6 @@ const SOCIALS = [
   {
     name: "Roblox",
     href: "https://www.roblox.com/users/1218134282/profile",
-    color: "#FFFFFF",
     svg: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
         <path d="M3.272 2 2 19.728 19.728 22 22 4.272 3.272 2Zm10.124 12.95-4.522-1.156 1.156-4.522 4.522 1.156-1.156 4.522Z" />
@@ -29,7 +28,6 @@ const SOCIALS = [
   {
     name: "Steam",
     href: "https://steamcommunity.com/id/darklorddan",
-    color: "#FFFFFF",
     svg: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
         <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658a3.394 3.394 0 0 1 1.913-.59c.063 0 .125.004.186.006l2.866-4.146v-.06a4.535 4.535 0 0 1 4.534-4.532 4.534 4.534 0 0 1 4.532 4.535 4.535 4.535 0 0 1-4.538 4.535h-.105l-4.07 2.91c0 .052.004.105.004.157a3.408 3.408 0 0 1-3.408 3.408c-1.61 0-2.974-1.118-3.31-2.626L.523 15.83C1.972 20.66 6.563 24 11.979 24c6.624 0 11.99-5.367 11.99-12C23.97 5.367 18.603 0 11.979 0M7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375a2.561 2.561 0 0 0 .003-1.961 2.51 2.51 0 0 0-1.378-1.375 2.553 2.553 0 0 0-1.89-.001l1.523.63a1.886 1.886 0 0 1 1.017 2.466 1.89 1.89 0 0 1-2.467 1.018m13.418-8.728a3.022 3.022 0 0 0-3.022-3.022 3.023 3.023 0 0 0-3.024 3.022 3.024 3.024 0 0 0 3.024 3.023 3.023 3.023 0 0 0 3.022-3.023m-5.284-.005a2.268 2.268 0 0 1 2.266-2.265 2.268 2.268 0 0 1 2.265 2.265 2.267 2.267 0 0 1-2.265 2.266 2.268 2.268 0 0 1-2.266-2.266" />
@@ -39,7 +37,6 @@ const SOCIALS = [
   {
     name: "TikTok",
     href: "https://www.tiktok.com/@ku33x?lang=en",
-    color: "#FFFFFF",
     svg: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%">
         <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.9a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.33Z" />
@@ -107,7 +104,7 @@ const BioLink = () => {
   const [error, setError] = useState(null);
   const [muted, setMuted] = useState(true);
   const [videoReady, setVideoReady] = useState(false);
-  const [views, setViews] = useState(64);
+  const [views, setViews] = useState(0);
   const videoRef = useRef(null);
 
   // Fetch Lanyard data
@@ -138,13 +135,33 @@ const BioLink = () => {
     };
   }, []);
 
-  // Bump view counter once per session
+  // Bump view counter once per unique visitor using backend
   useEffect(() => {
-    const seen = sessionStorage.getItem("kurx_viewed");
-    if (!seen) {
-      sessionStorage.setItem("kurx_viewed", "1");
-      setViews((v) => v + 1);
+    let visitorId = localStorage.getItem("kurx_visitor_id");
+    if (!visitorId) {
+      visitorId =
+        (window.crypto?.randomUUID && window.crypto.randomUUID()) ||
+        `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem("kurx_visitor_id", visitorId);
     }
+    fetch(`${API_BASE}/api/views/visit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ visitor_id: visitorId }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (typeof d.count === "number") setViews(d.count);
+      })
+      .catch(() => {
+        // Fallback: just fetch the public count
+        fetch(`${API_BASE}/api/views`)
+          .then((r) => r.json())
+          .then((d) => {
+            if (typeof d.count === "number") setViews(d.count);
+          })
+          .catch(() => {});
+      });
   }, []);
 
   const toggleMute = async () => {
@@ -224,8 +241,7 @@ const BioLink = () => {
         {/* Username */}
         <h1
           data-testid="username"
-          className="float-in delay-2 mt-6 text-5xl font-semibold tracking-tight md:text-6xl"
-          style={{ textShadow: "0 4px 24px rgba(0,0,0,0.7)" }}
+          className="float-in delay-2 username-glow mt-6 text-5xl font-semibold tracking-tight md:text-6xl"
         >
           {username}
         </h1>
@@ -317,10 +333,9 @@ const BioLink = () => {
               target="_blank"
               rel="noreferrer"
               aria-label={s.name}
-              className="social-icon-btn block h-8 w-8 text-white"
-              style={{ color: s.color }}
+              className="social-icon-btn flex h-12 w-12 items-center justify-center rounded-full bg-white text-black"
             >
-              {s.svg}
+              <span className="block h-6 w-6">{s.svg}</span>
             </a>
           ))}
         </div>

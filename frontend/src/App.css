@@ -115,3 +115,27 @@
     background: rgba(255, 255, 255, 0.12);
     transform: scale(1.05);
 }
+
+/* Animated white/cyan glow for the username */
+@keyframes name-glow {
+    0%,
+    100% {
+        text-shadow:
+            0 0 6px rgba(255, 255, 255, 0.55),
+            0 0 18px rgba(255, 255, 255, 0.35),
+            0 0 36px rgba(180, 220, 255, 0.25),
+            0 4px 22px rgba(0, 0, 0, 0.7);
+    }
+    50% {
+        text-shadow:
+            0 0 10px rgba(255, 255, 255, 0.85),
+            0 0 28px rgba(255, 255, 255, 0.55),
+            0 0 56px rgba(180, 220, 255, 0.45),
+            0 4px 22px rgba(0, 0, 0, 0.7);
+    }
+}
+
+.username-glow {
+    color: #ffffff;
+    animation: name-glow 3.2s ease-in-out infinite;
+}

@@ -42,6 +42,40 @@ class StatusCheckCreate(BaseModel):
 async def root():
     return {"message": "Hello World"}
 
+
+# ---------------- Unique visitor tracking ----------------
+class VisitIn(BaseModel):
+    visitor_id: str
+
+
+class VisitOut(BaseModel):
+    count: int
+    new: bool
+
+
+@api_router.post("/views/visit", response_model=VisitOut)
+async def track_visit(payload: VisitIn):
+    """Record a unique visitor by client-generated id and return total unique views."""
+    vid = (payload.visitor_id or "").strip()[:128]
+    is_new = False
+    if vid:
+        existing = await db.unique_visitors.find_one({"_id": vid})
+        if not existing:
+            await db.unique_visitors.insert_one({
+                "_id": vid,
+                "first_seen": datetime.now(timezone.utc).isoformat(),
+            })
+            is_new = True
+    total = await db.unique_visitors.count_documents({})
+    return VisitOut(count=total, new=is_new)
+
+
+@api_router.get("/views", response_model=VisitOut)
+async def get_views():
+    total = await db.unique_visitors.count_documents({})
+    return VisitOut(count=total, new=False)
+
+
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.model_dump()
