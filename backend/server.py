@@ -1,8 +1,9 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import hashlib
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
@@ -53,19 +54,62 @@ class VisitOut(BaseModel):
     new: bool
 
 
+def _client_fingerprint(request: Request) -> str:
+    """Build a server-side fingerprint from IP + User-Agent.
+    Acts as a fallback dedupe key when localStorage is cleared / incognito."""
+    xff = request.headers.get("x-forwarded-for", "")
+    ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else "")
+    ua = request.headers.get("user-agent", "")
+    raw = f"{ip}|{ua}"
+    return "fp:" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
+
+
 @api_router.post("/views/visit", response_model=VisitOut)
-async def track_visit(payload: VisitIn):
-    """Record a unique visitor by client-generated id and return total unique views."""
+async def track_visit(payload: VisitIn, request: Request):
+    """Record a unique visitor. Dedupes by BOTH:
+      1. Client-supplied visitor_id (localStorage UUID) — persists across refreshes
+      2. Server-derived fingerprint (ip + user-agent hash) — catches incognito / cleared storage
+    A visitor is only counted ONCE; subsequent visits never bump the counter.
+    """
     vid = (payload.visitor_id or "").strip()[:128]
+    fp = _client_fingerprint(request)
+
+    # Check if EITHER key is already known (as primary _id OR as alias)
+    keys_to_check = [k for k in (vid, fp) if k]
+    existing = None
+    if keys_to_check:
+        existing = await db.unique_visitors.find_one({
+            "$or": [
+                {"_id": {"$in": keys_to_check}},
+                {"aliases": {"$in": keys_to_check}},
+            ]
+        })
+
     is_new = False
-    if vid:
-        existing = await db.unique_visitors.find_one({"_id": vid})
-        if not existing:
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    if existing:
+        # Returning visitor: just update last_seen, never bump count
+        await db.unique_visitors.update_one(
+            {"_id": existing["_id"]},
+            {"$set": {"last_seen": now_iso},
+             "$addToSet": {"aliases": {"$each": [k for k in (vid, fp) if k and k != existing["_id"]]}}},
+        )
+    else:
+        # Brand-new visitor → count once
+        primary_key = vid or fp
+        try:
             await db.unique_visitors.insert_one({
-                "_id": vid,
-                "first_seen": datetime.now(timezone.utc).isoformat(),
+                "_id": primary_key,
+                "first_seen": now_iso,
+                "last_seen": now_iso,
+                "aliases": [k for k in (vid, fp) if k and k != primary_key],
             })
             is_new = True
+        except Exception:
+            # Race condition — another request already inserted with same id; treat as returning
+            is_new = False
+
     total = await db.unique_visitors.count_documents({})
     return VisitOut(count=total, new=is_new)
 
